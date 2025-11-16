@@ -394,6 +394,22 @@ const NetworkGraph = () => {
       width: '100%', 
       height: '100%',
     }}>
+      {/* Background map layer */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${new URL('../data/Americas.svg', import.meta.url).href})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0.15,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
+      
       {/* Header with Logo */}
       <div style={{
         position: 'absolute',
@@ -599,7 +615,15 @@ const NetworkGraph = () => {
             window.fgRef.zoomToFit(400, 80);
           }
         }}
-        ref={(ref) => { window.fgRef = ref; }}
+        ref={(ref) => { 
+          window.fgRef = ref;
+          // Ensure the canvas is properly layered and clickable
+          if (ref && ref._ctx && ref._ctx.canvas) {
+            ref._ctx.canvas.style.position = 'relative';
+            ref._ctx.canvas.style.zIndex = '1';
+            ref._ctx.canvas.style.cursor = 'pointer';
+          }
+        }}
         nodeCanvasObject={(node, ctx, globalScale) => {
           // Draw the icon
           drawNodeIcon(node, ctx, globalScale);
