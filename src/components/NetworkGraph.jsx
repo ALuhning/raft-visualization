@@ -584,6 +584,9 @@ const NetworkGraph = () => {
         // Provide some padding so the graph does not overlap the header.
         width={window.innerWidth}
         height={window.innerHeight - 90}
+        // Background image
+        backgroundImageUrl={new URL('../data/Americas.svg', import.meta.url).href}
+        backgroundImageOpacity={0.08}
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
