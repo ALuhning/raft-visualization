@@ -591,23 +591,29 @@ const NetworkGraph = () => {
         </div>
       </div>
 
-      <ForceGraph2D
-        graphData={graphData}
-        nodeId="id"
-        nodeLabel={(node) => node.name}
-        // Display a tooltip on the link showing relationship and tensions.
-        linkLabel={(link) => `${link.relationship}\n${link.tension}`}
-        nodeColor={(node) => node.color}
-        // Add arrows to the end of links to indicate directionality.
-        linkDirectionalArrowLength={6}
-        linkDirectionalArrowRelPos={1}
-        // Provide some padding so the graph does not overlap the header.
-        width={window.innerWidth}
-        height={window.innerHeight - 90}
-        backgroundColor="rgba(0,0,0,0)"
-        enablePointerInteraction={true}
-        // Start zoomed in for better initial view
-        d3VelocityDecay={0.3}
+      {/* Graph canvas layer - needs to be between background and UI elements */}
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        pointerEvents: 'auto',
+      }}>
+        <ForceGraph2D
+          graphData={graphData}
+          nodeId="id"
+          nodeLabel={(node) => node.name}
+          // Display a tooltip on the link showing relationship and tensions.
+          linkLabel={(link) => `${link.relationship}\n${link.tension}`}
+          nodeColor={(node) => node.color}
+          // Add arrows to the end of links to indicate directionality.
+          linkDirectionalArrowLength={6}
+          linkDirectionalArrowRelPos={1}
+          // Provide some padding so the graph does not overlap the header.
+          width={window.innerWidth}
+          height={window.innerHeight - 90}
+          backgroundColor="rgba(0,0,0,0)"
+          enablePointerInteraction={true}
+          // Start zoomed in for better initial view
+          d3VelocityDecay={0.3}
         cooldownTicks={100}
         onEngineStop={() => {
           // Auto-zoom to fit with padding after initial layout
@@ -671,6 +677,7 @@ const NetworkGraph = () => {
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
       />
+      </div>
       
       {selectedNode && (
         <>
