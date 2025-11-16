@@ -405,7 +405,7 @@ const NetworkGraph = () => {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        opacity: 0.08,
+        opacity: 0.15,
         pointerEvents: 'none',
         zIndex: 0,
       }} />
@@ -604,7 +604,8 @@ const NetworkGraph = () => {
         // Provide some padding so the graph does not overlap the header.
         width={window.innerWidth}
         height={window.innerHeight - 90}
-        backgroundColor="rgba(255,255,255,0.92)"
+        backgroundColor="rgba(0,0,0,0)"
+        enablePointerInteraction={true}
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
