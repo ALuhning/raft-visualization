@@ -774,7 +774,7 @@ const NetworkGraph = () => {
         minWidth: '300px',
       }}>
         <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#0f2537', fontWeight: '600', borderBottom: '2px solid #d4af37', paddingBottom: '8px' }}>
-          NATO Symbology Legend
+          Symbology Legend
         </h4>
         
         {/* Friendly Entities */}
