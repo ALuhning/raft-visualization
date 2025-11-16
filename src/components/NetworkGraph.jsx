@@ -674,7 +674,7 @@ const NetworkGraph = () => {
         nodePointerAreaPaint={(node, color, ctx) => {
           ctx.fillStyle = color;
           ctx.beginPath();
-          ctx.arc(node.x, node.y, 8, 0, 2 * Math.PI, false);
+          ctx.arc(node.x, node.y, 15, 0, 2 * Math.PI, false);
           ctx.fill();
         }}
         onNodeClick={handleNodeClick}
