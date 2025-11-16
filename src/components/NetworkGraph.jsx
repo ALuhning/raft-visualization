@@ -671,29 +671,11 @@ const NetworkGraph = () => {
           ctx.fillText(label, node.x, node.y + 13);
         }}
         nodePointerAreaPaint={(node, color, ctx) => {
-          const size = 10;
-          const type = getNodeType(node.id);
-          
+          // Large circular hit area for all nodes - easier clicking
           ctx.fillStyle = color;
-          
-          if (type === 'friendly') {
-            // Rectangle - same as visual
-            ctx.fillRect(node.x - size - 2, node.y - size * 0.6 - 2, size * 2 + 4, size * 1.2 + 4);
-          } else if (type === 'adversary') {
-            // Diamond - same as visual
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y - size - 2);
-            ctx.lineTo(node.x + size * 1.3 + 2, node.y);
-            ctx.lineTo(node.x, node.y + size + 2);
-            ctx.lineTo(node.x - size * 1.3 - 2, node.y);
-            ctx.closePath();
-            ctx.fill();
-          } else {
-            // Circle for neutral
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, size + 2, 0, 2 * Math.PI, false);
-            ctx.fill();
-          }
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI, false);
+          ctx.fill();
         }}
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
