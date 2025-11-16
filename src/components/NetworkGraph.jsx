@@ -606,8 +606,10 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-          // Start zoomed in for better initial view
-          d3VelocityDecay={0.3}
+        nodeCanvasObjectMode={() => 'after'}
+        nodeRelSize={15}
+        // Start zoomed in for better initial view
+        d3VelocityDecay={0.3}
         cooldownTicks={100}
         onEngineStop={() => {
           // Auto-zoom to fit with padding after initial layout
@@ -669,13 +671,6 @@ const NetworkGraph = () => {
           ctx.textBaseline = 'top';
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 13);
-        }}
-        nodePointerAreaPaint={(node, color, ctx) => {
-          // Large circular hit area for all nodes - easier clicking
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, 20, 0, 2 * Math.PI, false);
-          ctx.fill();
         }}
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
