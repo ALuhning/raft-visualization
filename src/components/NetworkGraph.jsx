@@ -389,7 +389,16 @@ const NetworkGraph = () => {
   };
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ 
+      position: 'relative', 
+      width: '100%', 
+      height: '100%',
+      backgroundImage: `url(${new URL('../data/Americas.svg', import.meta.url).href})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundOpacity: 0.08,
+    }}>
       {/* Header with Logo */}
       <div style={{
         position: 'absolute',
@@ -584,9 +593,7 @@ const NetworkGraph = () => {
         // Provide some padding so the graph does not overlap the header.
         width={window.innerWidth}
         height={window.innerHeight - 90}
-        // Background image
-        backgroundImageUrl={new URL('../data/Americas.svg', import.meta.url).href}
-        backgroundImageOpacity={0.08}
+        backgroundColor="rgba(255,255,255,0.92)"
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
