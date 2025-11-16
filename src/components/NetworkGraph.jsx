@@ -393,12 +393,23 @@ const NetworkGraph = () => {
       position: 'relative', 
       width: '100%', 
       height: '100%',
-      backgroundImage: `url(${new URL('../data/Americas.svg', import.meta.url).href})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundOpacity: 0.08,
     }}>
+      {/* Background map layer - behind everything */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundImage: `url(${new URL('../data/Americas.svg', import.meta.url).href})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        opacity: 0.08,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
+      
       {/* Header with Logo */}
       <div style={{
         position: 'absolute',
