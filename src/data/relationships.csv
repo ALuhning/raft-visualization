@@ -1,0 +1,33 @@
+#,Actor,Interacts With (#),Relationship Type,Tensions
+1,Canada,"10, 12, 15, 18",NORAD integration; maritime patrols; Op CARIBBE,Legal constraints on strikes; differing risk tolerance
+2,Mexico,"8, 15, 22, 28",Border flows; precursor chemicals; TCO corridors,Corruption; political reluctance; sovereignty sensitivity
+3,Colombia,"23, 24, 18, 15",ELN/FARC-D sanctuary; border security,Limited control of frontier; regime hostility
+4,Brazil,"18, 28, 31",Regional diplomacy; Amazon border; PRC influence,PRC investment leverage; political swings
+5,Caribbean States,"15, 22, 28",Maritime chokepoints; TCO routes,Weak governance; PRC port influence
+6,OAS,"1–5, 18, 28",Regional political coordination,Blocked consensus by Venezuela/PRC-aligned members
+7,IADB,"1–5, 18",Inter-American military forum,Limited authority; political friction among members
+8,DHS,"2, 10, 15, 18, 22",Border security; migration flows; interdictions,Title 10 vs Title 6 friction; intel barriers
+9,FBI,"25, 26, 18","CT/CI vs Hezbollah, IRGC, regime intel",Jurisdiction limits; host-nation cooperation
+10,Coast Guard,"1, 2, 5, 15, 22",Maritime interdiction; TCO disruption,ROE limits; lack of partner capacity
+11,State Dept,"1–7, 18, 28–32","Diplomacy, sanctions, coalition building",Divergent partner priorities
+12,NORAD,"1, 10, 18, 28",Aerospace/maritime warning,Sensor gaps; modernization needs
+13,SOCNORTH/SOCSOUTH,"23–27, 22, 18",SOF vs TCO/VEO/proxies,Political sensitivity; intel-sharing limits
+14,JTF-North,"2, 8, 22",Border coordination; interdiction fusion,Legal constraints; varied cooperation
+15,JIATF-South,"1–5, 22–24",Multinational fusion center; TCO targeting,Legal limits on boat strikes; partner gaps
+16,TRANSCOM,"1–5, 18",Mobility for contingencies,Lift constraints; contested logistics
+17,CYBERCOM,"18, 25, 26, 28–30",Counters cyber/disinfo; protects networks,Attribution difficulty; hostile retaliation
+18,Maduro Regime,"1–7, 8–17, 23–32",Central node; engages all actors directly/indirectly,Regime survival imperative; sanctions; strategic alignment w/ PRC-RUS-IRAN
+19,FANB / GNB,"22, 23, 24, 27, 28–30",Provides sanctuary; facilitates smuggling; engages foreign intel,Rivalries; corruption; dependence on backers
+20,SEBIN / DGCIM,"25, 26, 27, 28–30",Intelligence sharing w/ Cuba/Russia/Iran; internal repression,CI breaches; exposure risk
+21,PDVSA,"30, 31, 28",Dark fleet; energy swaps; gold/oil laundering,Sanctions; internal decay
+22,Cartel de los Soles,"2, 5, 15, 23, 24, 31",Controls major TCO pipelines; regional illicit finance,Internal rivalries; DEA/JIATF pressure
+23,ELN,"3, 18, 19, 22",Sanctuary; illegal mining; trafficking,Internal factionalism; cross-border friction
+24,FARC-D,"3, 18, 19, 22, 31",Cocaine production + pipeline control,Competition w/ ELN; exposure to Colombia ops
+25,Hezbollah,"9, 18, 20, 30",Terror finance; money laundering,U.S. CT pressure; covert operations risk
+26,IRGC-QF,"9, 17, 18, 21, 30","Drones, cyber, covert support",Sanctions; escalatory potential
+27,Cuban G2,"18, 20",Supports regime intelligence/security apparatus,Dependency tension; FANB resentment
+28,China (PRC),"1–7, 18–21, 24, 31","Infrastructure, loans, surveillance tech, strategic influence",Debt leverage; regional backlash; U.S.–PRC competition
+29,Russia,"12, 17, 18, 20, 25","Disinfo, cyber, arms sustainment, propaganda",Sanctions; resource constraints
+30,Iran,"21, 25, 26, 18","Dark fleet, energy swaps, covert security cooperation",Sanctions; U.S./Israel pressure
+31,Turkey,"21, 22, 24","Gold laundering, illicit finance channels",U.S. financial pressure; exposure risk
+32,Belarus / Syria,"18, 20",Diplomatic protection; ideological support,Limited resources; primarily political
