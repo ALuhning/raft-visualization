@@ -606,8 +606,7 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-        nodeCanvasObjectMode={() => 'after'}
-        nodeRelSize={15}
+        nodeCanvasObjectMode={() => 'replace'}
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
@@ -671,6 +670,12 @@ const NetworkGraph = () => {
           ctx.textBaseline = 'top';
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 13);
+        }}
+        nodePointerAreaPaint={(node, color, ctx) => {
+          // Match the label + icon area with generous padding
+          const size = 12;
+          ctx.fillStyle = color;
+          ctx.fillRect(node.x - size * 2, node.y - size, size * 4, size * 3);
         }}
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
