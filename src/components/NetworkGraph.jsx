@@ -513,8 +513,8 @@ const NetworkGraph = () => {
         // Display a tooltip on the link showing relationship and tensions.
         linkLabel={(link) => `${link.relationship}\n${link.tension}`}
         nodeColor={(node) => node.color}
-        nodeRelSize={4}
-        nodeVal={1}
+        nodeRelSize={6}
+        nodeVal={(node) => 10}
         // Add arrows to the end of links to indicate directionality.
         linkDirectionalArrowLength={6}
         linkDirectionalArrowRelPos={1}
@@ -523,20 +523,7 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-        nodeLabel={(node) => node.name}
-        nodeCanvasObjectMode={() => 'before'}
-        nodeCanvasObject={(node, ctx, globalScale) => {
-          // Draw label BEFORE the node so it doesn't block clicks
-          const label = node.name;
-          const fontSize = 10 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = 'black';
-          ctx.fillText(label, node.x, node.y + 8);
-        }}
-        // Render permanent labels using text objects
-        nodeThreeObject={false}
+        nodeLabel="name"
         // Force settings to prevent node overlap
         d3AlphaDecay={0.02}
         d3VelocityDecay={0.3}
