@@ -513,7 +513,8 @@ const NetworkGraph = () => {
         // Display a tooltip on the link showing relationship and tensions.
         linkLabel={(link) => `${link.relationship}\n${link.tension}`}
         nodeColor={(node) => node.color}
-        nodeRelSize={8}
+        nodeRelSize={15}
+        nodeVal={15}
         // Add arrows to the end of links to indicate directionality.
         linkDirectionalArrowLength={6}
         linkDirectionalArrowRelPos={1}
@@ -522,7 +523,9 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-        nodeCanvasObjectMode={() => 'after'}
+        nodeLabel={(node) => node.name}
+        // Render permanent labels using text objects
+        nodeThreeObject={false}
         // Force settings to prevent node overlap
         d3AlphaDecay={0.02}
         d3VelocityDecay={0.3}
@@ -530,24 +533,6 @@ const NetworkGraph = () => {
         cooldownTicks={200}
         cooldownTime={15000}
         // Collision detection - prevent nodes from overlapping
-        nodeCanvasObject={(node, ctx, globalScale) => {
-          // Only draw the label - let library handle the node circle
-          const label = node.name;
-          const fontSize = 12 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
-          const textWidth = ctx.measureText(label).width;
-          const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
-
-          // Draw label background
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y + 10, bckgDimensions[0], bckgDimensions[1]);
-
-          // Draw label text
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
-          ctx.fillStyle = 'black';
-          ctx.fillText(label, node.x, node.y + 11);
-        }}
         d3Force={(simulation) => {
           // Add collision force to prevent overlapping
           simulation.force('collision', d3.forceCollide().radius(20).strength(1));
