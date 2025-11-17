@@ -65,101 +65,15 @@ const NetworkGraph = () => {
   // Draw icon based on node type
   const drawNodeIcon = (node, ctx, globalScale) => {
     const size = 10;
-    const type = getNodeType(node.id);
     
+    // Simple circle for all nodes
+    ctx.beginPath();
+    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
     ctx.fillStyle = node.color;
+    ctx.fill();
     ctx.strokeStyle = '#000';
-    ctx.lineWidth = 1.5;
-
-    if (type === 'friendly') {
-      // NATO Friendly - Rectangle (Blue)
-      const nodeId = parseInt(node.id, 10);
-      
-      // Draw rectangle frame
-      ctx.fillStyle = node.color;
-      ctx.fillRect(node.x - size, node.y - size * 0.6, size * 2, size * 1.2);
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.strokeRect(node.x - size, node.y - size * 0.6, size * 2, size * 1.2);
-      
-      // Add symbol inside based on type
-      ctx.fillStyle = '#000';
-      ctx.font = `bold ${size * 1.2}px Arial`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      // Determine symbol based on node category or ID
-      if (nodeId >= 1 && nodeId <= 7) {
-        // Nations/Multilateral - use flag/headquarters symbol
-        ctx.fillText('⚑', node.x, node.y);
-      } else if (nodeId >= 8 && nodeId <= 17) {
-        // US System Actors - use unit symbol
-        ctx.strokeStyle = '#000';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(node.x - size * 0.5, node.y - size * 0.4, size, size * 0.8);
-      } else if (nodeId === 33) {
-        // Operational actor
-        ctx.fillText('×', node.x, node.y);
-      }
-      
-    } else if (type === 'adversary') {
-      // NATO Hostile - Diamond frame (Red)
-      const nodeId = parseInt(node.id, 10);
-      
-      // Draw diamond frame
-      ctx.beginPath();
-      ctx.moveTo(node.x, node.y - size);
-      ctx.lineTo(node.x + size * 1.3, node.y);
-      ctx.lineTo(node.x, node.y + size);
-      ctx.lineTo(node.x - size * 1.3, node.y);
-      ctx.closePath();
-      ctx.fillStyle = node.color;
-      ctx.fill();
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      
-      // Add echelon/modifier inside
-      ctx.fillStyle = '#000';
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.2;
-      
-      if (nodeId === 18 || nodeId === 19 || nodeId === 20 || nodeId === 21) {
-        // Regime entities - command post symbol (circle with line)
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, size * 0.4, 0, 2 * Math.PI);
-        ctx.stroke();
-      } else if ([22, 23, 24].includes(nodeId)) {
-        // Criminal/Irregular - curved line symbol
-        ctx.beginPath();
-        ctx.arc(node.x, node.y, size * 0.5, 0.5, Math.PI - 0.5);
-        ctx.stroke();
-      } else if ([25, 26, 27].includes(nodeId)) {
-        // Proxy/Terror groups - asterisk
-        ctx.font = `bold ${size * 1.2}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('*', node.x, node.y);
-      } else if ([28, 29, 30, 31, 32].includes(nodeId)) {
-        // External state actors - double bar
-        ctx.beginPath();
-        ctx.moveTo(node.x - size * 0.5, node.y - size * 0.2);
-        ctx.lineTo(node.x + size * 0.5, node.y - size * 0.2);
-        ctx.moveTo(node.x - size * 0.5, node.y + size * 0.2);
-        ctx.lineTo(node.x + size * 0.5, node.y + size * 0.2);
-        ctx.stroke();
-      }
-      
-    } else {
-      // Neutral/Unknown - Circle
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, size * 0.8, 0, 2 * Math.PI, false);
-      ctx.fillStyle = node.color;
-      ctx.fill();
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
+    ctx.lineWidth = 2;
+    ctx.stroke();
   };
 
   useEffect(() => {
@@ -672,10 +586,11 @@ const NetworkGraph = () => {
           ctx.fillText(label, node.x, node.y + 13);
         }}
         nodePointerAreaPaint={(node, color, ctx) => {
-          // Match the label + icon area with generous padding
-          const size = 12;
+          // Circle matching the visual with padding
           ctx.fillStyle = color;
-          ctx.fillRect(node.x - size * 2, node.y - size, size * 4, size * 3);
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 12, 0, 2 * Math.PI, false);
+          ctx.fill();
         }}
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
@@ -802,10 +717,10 @@ const NetworkGraph = () => {
         padding: '16px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         zIndex: 1000,
-        minWidth: '300px',
+        minWidth: '250px',
       }}>
         <h4 style={{ margin: '0 0 12px 0', fontSize: '16px', color: '#0f2537', fontWeight: '600', borderBottom: '2px solid #d4af37', paddingBottom: '8px' }}>
-          Symbology Legend
+          Legend
         </h4>
         
         {/* Friendly Entities */}
@@ -813,28 +728,11 @@ const NetworkGraph = () => {
           <div style={{ fontSize: '13px', fontWeight: '600', color: '#0f2537', marginBottom: '6px' }}>
             Friendly Forces (Nodes 1-17, 33)
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="18" viewBox="-12 -9 24 18">
-                <rect x="-10" y="-6" width="20" height="12" fill="hsl(210, 70%, 50%)" stroke="#000" strokeWidth="1.5"/>
-                <text x="0" y="2" fontSize="12" textAnchor="middle" fill="#000">⚑</text>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>Nations/Multilateral Orgs (1-7)</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="18" viewBox="-12 -9 24 18">
-                <rect x="-10" y="-6" width="20" height="12" fill="hsl(210, 70%, 55%)" stroke="#000" strokeWidth="1.5"/>
-                <rect x="-5" y="-4" width="10" height="8" fill="none" stroke="#000" strokeWidth="1"/>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>US System Actors (8-17)</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="18" viewBox="-12 -9 24 18">
-                <rect x="-10" y="-6" width="20" height="12" fill="hsl(210, 70%, 60%)" stroke="#000" strokeWidth="1.5"/>
-                <text x="0" y="2" fontSize="14" fontWeight="bold" textAnchor="middle" fill="#000">×</text>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>Operational Forces (33)</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '8px' }}>
+            <svg width="20" height="20" viewBox="-10 -10 20 20">
+              <circle cx="0" cy="0" r="8" fill="hsl(210, 70%, 50%)" stroke="#000" strokeWidth="2"/>
+            </svg>
+            <span style={{ fontSize: '11px', color: '#555' }}>Blue circles (varying shades)</span>
           </div>
         </div>
 
@@ -843,41 +741,12 @@ const NetworkGraph = () => {
           <div style={{ fontSize: '13px', fontWeight: '600', color: '#0f2537', marginBottom: '6px' }}>
             Hostile Forces (Nodes 18-32)
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingLeft: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="20" viewBox="-12 -10 24 20">
-                <path d="M0,-10 L13,0 L0,10 L-13,0 Z" fill="hsl(0, 70%, 50%)" stroke="#000" strokeWidth="1.5"/>
-                <circle cx="0" cy="0" r="4" fill="none" stroke="#000" strokeWidth="1.2"/>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>Regime Command (18-21)</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="20" viewBox="-12 -10 24 20">
-                <path d="M0,-10 L13,0 L0,10 L-13,0 Z" fill="hsl(0, 70%, 55%)" stroke="#000" strokeWidth="1.5"/>
-                <path d="M0,-5 Q5,0 0,5" fill="none" stroke="#000" strokeWidth="1.2"/>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>Irregular/TCO (22-24)</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="20" viewBox="-12 -10 24 20">
-                <path d="M0,-10 L13,0 L0,10 L-13,0 Z" fill="hsl(0, 70%, 60%)" stroke="#000" strokeWidth="1.5"/>
-                <text x="0" y="4" fontSize="12" fontWeight="bold" textAnchor="middle" fill="#000">*</text>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>Terror/Proxy Groups (25-27)</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <svg width="24" height="20" viewBox="-12 -10 24 20">
-                <path d="M0,-10 L13,0 L0,10 L-13,0 Z" fill="hsl(0, 70%, 65%)" stroke="#000" strokeWidth="1.5"/>
-                <line x1="-5" y1="-2" x2="5" y2="-2" stroke="#000" strokeWidth="1.2"/>
-                <line x1="-5" y1="2" x2="5" y2="2" stroke="#000" strokeWidth="1.2"/>
-              </svg>
-              <span style={{ fontSize: '11px', color: '#555' }}>State Adversaries (28-32)</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingLeft: '8px' }}>
+            <svg width="20" height="20" viewBox="-10 -10 20 20">
+              <circle cx="0" cy="0" r="8" fill="hsl(0, 70%, 50%)" stroke="#000" strokeWidth="2"/>
+            </svg>
+            <span style={{ fontSize: '11px', color: '#555' }}>Red circles (varying shades)</span>
           </div>
-        </div>
-        
-        <div style={{ marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #ddd', fontSize: '10px', color: '#666', fontStyle: 'italic' }}>
-          Based on NATO APP-6 Military Symbology
         </div>
       </div>
     </div>
