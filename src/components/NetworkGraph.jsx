@@ -523,7 +523,6 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-        nodeLabel="name"
         // Force settings to prevent node overlap
         d3AlphaDecay={0.02}
         d3VelocityDecay={0.3}
