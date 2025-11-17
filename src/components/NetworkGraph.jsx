@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import Papa from 'papaparse';
+import * as d3 from 'd3-force';
 
 /**
  * NetworkGraph component
@@ -522,6 +523,13 @@ const NetworkGraph = () => {
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
         nodeCanvasObjectMode={() => 'after'}
+        // Force settings to prevent node overlap
+        d3AlphaDecay={0.02}
+        d3VelocityDecay={0.3}
+        warmupTicks={100}
+        cooldownTicks={200}
+        cooldownTime={15000}
+        // Collision detection - prevent nodes from overlapping
         nodeCanvasObject={(node, ctx, globalScale) => {
           // Only draw the label - let library handle the node circle
           const label = node.name;
@@ -540,9 +548,12 @@ const NetworkGraph = () => {
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 11);
         }}
-        // Start zoomed in for better initial view
-        d3VelocityDecay={0.3}
-        cooldownTicks={100}
+        d3Force={(simulation) => {
+          // Add collision force to prevent overlapping
+          simulation.force('collision', d3.forceCollide().radius(20).strength(1));
+          // Stronger charge force to spread nodes apart
+          simulation.force('charge').strength(-200);
+        }}
         onEngineStop={() => {
           // Auto-zoom to fit with padding after initial layout
           if (window.fgRef) {
