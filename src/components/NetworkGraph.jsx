@@ -1,34 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import ForceGraph2D from 'react-force-graph-2d';
+import React, { useEffect, useState, useRef } from 'react';
+import { Network } from 'vis-network';
+import { DataSet } from 'vis-data';
 import Papa from 'papaparse';
-import * as d3 from 'd3-force';
 
 /**
  * NetworkGraph component
  *
  * This component loads relationship data from a CSV file, constructs a
- * network graph, and renders it using the ForceGraph2D component. The
- * graph nodes correspond to the actors listed in the CSV and the links
- * represent their interactions. Relationship types and tensions are
- * displayed as tooltips on the links.
+ * network graph, and renders it using vis-network. The graph nodes 
+ * correspond to the actors listed in the CSV and the links represent 
+ * their interactions. Relationship types and tensions are displayed 
+ * in the side panels when nodes are clicked.
  */
 const NetworkGraph = () => {
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+  const networkContainer = useRef(null);
+  const networkInstance = useRef(null);
+  const [nodesDataSet, setNodesDataSet] = useState(null);
+  const [edgesDataSet, setEdgesDataSet] = useState(null);
   const [selectedNode, setSelectedNode] = useState(null);
   const [nodeEdges, setNodeEdges] = useState([]);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
-  const [, setTick] = useState(0);
-
-  // Animation loop for pulsing effect on selected node
-  useEffect(() => {
-    if (selectedNode) {
-      const interval = setInterval(() => {
-        setTick(t => t + 1);
-      }, 50); // Update every 50ms for smooth animation
-      return () => clearInterval(interval);
-    }
-  }, [selectedNode]);
+  const [rawData, setRawData] = useState([]);
 
   // Function to determine if a node is friendly or adversary
   const getNodeType = (id) => {
@@ -63,20 +56,6 @@ const NetworkGraph = () => {
     return '#888888';
   };
 
-  // Draw icon based on node type
-  const drawNodeIcon = (node, ctx, globalScale) => {
-    const size = 10;
-    
-    // Simple circle for all nodes
-    ctx.beginPath();
-    ctx.arc(node.x, node.y, size, 0, 2 * Math.PI, false);
-    ctx.fillStyle = node.color;
-    ctx.fill();
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  };
-
   useEffect(() => {
     // Function to load and parse CSV data
     const loadCSVData = (csvContent) => {
@@ -86,90 +65,106 @@ const NetworkGraph = () => {
         dynamicTyping: false,
       });
 
-      // Build a list of nodes from the CSV data. Each node has an id and
-      // a name. We could include additional properties here if desired.
+      setRawData(data);
+
+      // Build nodes for vis-network
       const nodes = data.map((row) => {
         const nodeId = row['Serial'];
         return {
-          id: nodeId,
+          id: parseInt(nodeId, 10),
+          label: row['Actor'],
+          title: row['Actor'], // Tooltip
+          color: {
+            background: getNodeColor(nodeId),
+            border: '#000000',
+            highlight: {
+              background: getNodeColor(nodeId),
+              border: '#FFD700',
+            }
+          },
+          font: {
+            color: '#ffffff',
+            size: 14,
+            face: 'Arial',
+            strokeWidth: 3,
+            strokeColor: '#000000'
+          },
+          size: 25,
+          // Store original data
           name: row['Actor'],
           category: row['Category'],
           description: row['ActorDescription'],
           relevance: row['Relevance'],
-          color: getNodeColor(nodeId),
         };
       });
 
-      // Construct the list of links. For each row in the CSV, we look
-      // at the "InteractsWithSerials" column which may contain semicolon-
-      // separated values or ranges (e.g., "1-5"). For each listed id,
-      // we create a link object with relationship and tension metadata.
-      const links = [];
+      // Construct edges
+      const edges = [];
       data.forEach((row) => {
-        const sourceId = row['Serial'];
+        const sourceId = parseInt(row['Serial'], 10);
         let interacts = row['InteractsWithSerials'];
         if (interacts) {
-          // Normalize en dashes to hyphens to make range parsing easier.
           interacts = interacts.replace(/–/g, '-');
-          // Split the string on semicolons to handle multiple entries.
           interacts.split(';').forEach((item) => {
             const trimmed = item.trim();
             if (!trimmed) return;
-            // Handle ranges like "1-5" by creating a link for each id in the range.
             if (trimmed.includes('-')) {
               const [startStr, endStr] = trimmed.split('-').map((s) => s.trim());
               const startNum = parseInt(startStr, 10);
               const endNum = parseInt(endStr, 10);
               if (!isNaN(startNum) && !isNaN(endNum)) {
                 for (let i = startNum; i <= endNum; i++) {
-                  links.push({
-                    source: sourceId,
-                    target: String(i),
+                  edges.push({
+                    from: sourceId,
+                    to: i,
+                    arrows: 'to',
+                    title: `${row['RelationshipType']}\n${row['Tensions']}`,
                     relationship: row['RelationshipType'],
                     tension: row['Tensions'],
+                    color: { color: '#848484', highlight: '#FFD700' },
+                    width: 2,
                   });
                 }
               }
             } else {
-              // Single id case.
-              const targetId = trimmed;
-              links.push({
-                source: sourceId,
-                target: targetId,
+              const targetId = parseInt(trimmed, 10);
+              edges.push({
+                from: sourceId,
+                to: targetId,
+                arrows: 'to',
+                title: `${row['RelationshipType']}\n${row['Tensions']}`,
                 relationship: row['RelationshipType'],
                 tension: row['Tensions'],
+                color: { color: '#848484', highlight: '#FFD700' },
+                width: 2,
               });
             }
           });
         }
       });
 
-      // Optionally, we could deduplicate links here. In some cases
-      // interactions are defined in both directions in the CSV. ForceGraph2D
-      // can handle duplicate links, but removing duplicates can make the
-      // visualization cleaner. We'll deduplicate based on source and target.
-      const uniqueLinks = [];
-      const linkSet = new Set();
-      links.forEach((link) => {
-        const key = `${link.source}->${link.target}`;
-        if (!linkSet.has(key)) {
-          linkSet.add(key);
-          uniqueLinks.push(link);
+      // Remove duplicate edges
+      const uniqueEdges = [];
+      const edgeSet = new Set();
+      edges.forEach((edge) => {
+        const key = `${edge.from}->${edge.to}`;
+        if (!edgeSet.has(key)) {
+          edgeSet.add(key);
+          uniqueEdges.push(edge);
         }
       });
 
-      setGraphData({ nodes, links: uniqueLinks });
+      setNodesDataSet(new DataSet(nodes));
+      setEdgesDataSet(new DataSet(uniqueEdges));
     };
 
     if (uploadedFile) {
-      // If user uploaded a file, read and parse it
       const reader = new FileReader();
       reader.onload = (e) => {
         loadCSVData(e.target.result);
       };
       reader.readAsText(uploadedFile);
     } else {
-      // Load default CSV file
       const csvUrl = new URL('../data/relationships1_fixed.csv', import.meta.url);
       fetch(csvUrl)
         .then((response) => response.text())
@@ -179,31 +174,112 @@ const NetworkGraph = () => {
     }
   }, [uploadedFile]);
 
-  const handleNodeClick = (node) => {
-    setSelectedNode(node);
-    
-    // Find all edges connected to this node
-    const connectedEdges = graphData.links.filter(
-      (link) => link.source.id === node.id || link.target.id === node.id
-    );
-    
-    // Format edge information
-    const edgeInfo = connectedEdges.map((link) => {
-      const isSource = link.source.id === node.id;
-      const otherNode = isSource ? link.target : link.source;
-      const direction = isSource ? 'to' : 'from';
-      
-      return {
-        direction,
-        otherNodeId: otherNode.id,
-        otherNodeName: otherNode.name,
-        otherNodeCategory: otherNode.category,
-        relationship: link.relationship,
-        tension: link.tension,
-      };
+  // Initialize vis-network when data is ready
+  useEffect(() => {
+    if (!nodesDataSet || !edgesDataSet || !networkContainer.current) return;
+
+    const data = {
+      nodes: nodesDataSet,
+      edges: edgesDataSet,
+    };
+
+    const options = {
+      nodes: {
+        shape: 'dot',
+        size: 25,
+        font: {
+          size: 14,
+          color: '#ffffff',
+          strokeWidth: 3,
+          strokeColor: '#000000'
+        },
+        borderWidth: 2,
+        borderWidthSelected: 4,
+      },
+      edges: {
+        width: 2,
+        color: { color: '#848484' },
+        smooth: {
+          type: 'continuous',
+          roundness: 0.5
+        }
+      },
+      physics: {
+        enabled: true,
+        barnesHut: {
+          gravitationalConstant: -8000,
+          centralGravity: 0.3,
+          springLength: 200,
+          springConstant: 0.04,
+          damping: 0.09,
+          avoidOverlap: 0.5
+        },
+        stabilization: {
+          enabled: true,
+          iterations: 200,
+          updateInterval: 25
+        }
+      },
+      interaction: {
+        hover: true,
+        tooltipDelay: 200,
+        zoomView: true,
+        dragView: true,
+        navigationButtons: true,
+      },
+    };
+
+    // Create network
+    const network = new Network(networkContainer.current, data, options);
+    networkInstance.current = network;
+
+    // Handle node click
+    network.on('click', (params) => {
+      if (params.nodes.length > 0) {
+        const nodeId = params.nodes[0];
+        const node = nodesDataSet.get(nodeId);
+        
+        // Find all edges connected to this node
+        const connectedEdges = edgesDataSet.get({
+          filter: (edge) => edge.from === nodeId || edge.to === nodeId
+        });
+        
+        // Format edge information
+        const edgeInfo = connectedEdges.map((edge) => {
+          const isSource = edge.from === nodeId;
+          const otherNodeId = isSource ? edge.to : edge.from;
+          const otherNode = nodesDataSet.get(otherNodeId);
+          
+          return {
+            direction: isSource ? 'to' : 'from',
+            otherNodeId: otherNodeId,
+            otherNodeName: otherNode.name,
+            otherNodeCategory: otherNode.category,
+            relationship: edge.relationship,
+            tension: edge.tension,
+          };
+        });
+        
+        setSelectedNode(node);
+        setNodeEdges(edgeInfo);
+      } else {
+        // Clicked on background
+        setSelectedNode(null);
+        setNodeEdges([]);
+      }
     });
-    
-    setNodeEdges(edgeInfo);
+
+    // Cleanup
+    return () => {
+      if (networkInstance.current) {
+        networkInstance.current.destroy();
+        networkInstance.current = null;
+      }
+    };
+  }, [nodesDataSet, edgesDataSet]);
+
+  const handleNodeClick = (node) => {
+    // This is now handled by vis-network click event
   };
 
   const handleBackgroundClick = () => {
@@ -506,44 +582,17 @@ const NetworkGraph = () => {
         </div>
       </div>
 
-      <ForceGraph2D
-        graphData={graphData}
-        nodeId="id"
-        nodeLabel={(node) => node.name}
-        // Display a tooltip on the link showing relationship and tensions.
-        linkLabel={(link) => `${link.relationship}\n${link.tension}`}
-        nodeColor={(node) => node.color}
-        nodeRelSize={4}
-        // Add arrows to the end of links to indicate directionality.
-        linkDirectionalArrowLength={6}
-        linkDirectionalArrowRelPos={1}
-        // Provide some padding so the graph does not overlap the header.
-        width={window.innerWidth}
-        height={window.innerHeight - 90}
-        backgroundColor="rgba(0,0,0,0)"
-        enablePointerInteraction={true}
-        // Force settings to prevent node overlap
-        d3AlphaDecay={0.02}
-        d3VelocityDecay={0.3}
-        warmupTicks={100}
-        cooldownTicks={200}
-        cooldownTime={15000}
-        // Collision detection - prevent nodes from overlapping
-        d3Force={(simulation) => {
-          // Add collision force to prevent overlapping
-          simulation.force('collision', d3.forceCollide().radius(12).strength(0.8));
-          // Stronger charge force to spread nodes apart
-          simulation.force('charge').strength(-150);
+      {/* Network visualization container */}
+      <div 
+        ref={networkContainer}
+        style={{
+          position: 'absolute',
+          top: '90px',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1,
         }}
-        onEngineStop={() => {
-          // Auto-zoom to fit with padding after initial layout
-          if (window.fgRef) {
-            window.fgRef.zoomToFit(400, 80);
-          }
-        }}
-        ref={(ref) => { window.fgRef = ref; }}
-        onNodeClick={handleNodeClick}
-        onBackgroundClick={handleBackgroundClick}
       />
       
       {selectedNode && (
