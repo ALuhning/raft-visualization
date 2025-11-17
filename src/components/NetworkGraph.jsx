@@ -512,6 +512,7 @@ const NetworkGraph = () => {
         // Display a tooltip on the link showing relationship and tensions.
         linkLabel={(link) => `${link.relationship}\n${link.tension}`}
         nodeColor={(node) => node.color}
+        nodeRelSize={8}
         // Add arrows to the end of links to indicate directionality.
         linkDirectionalArrowLength={6}
         linkDirectionalArrowRelPos={1}
@@ -520,7 +521,6 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
-        nodeCanvasObjectMode={() => 'replace'}
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
@@ -530,68 +530,7 @@ const NetworkGraph = () => {
             window.fgRef.zoomToFit(400, 80);
           }
         }}
-        ref={(ref) => { 
-          window.fgRef = ref;
-          // Ensure the canvas is properly layered and clickable
-          if (ref && ref._ctx && ref._ctx.canvas) {
-            ref._ctx.canvas.style.position = 'relative';
-            ref._ctx.canvas.style.zIndex = '1';
-            ref._ctx.canvas.style.cursor = 'pointer';
-          }
-        }}
-        nodeCanvasObject={(node, ctx, globalScale) => {
-          // Draw the icon
-          drawNodeIcon(node, ctx, globalScale);
-
-          // Highlight selected node with pulsing glow
-          if (selectedNode && selectedNode.id === node.id) {
-            const time = Date.now() / 1000;
-            const pulse = Math.sin(time * 3) * 0.5 + 0.5; // Oscillates between 0 and 1
-            const glowSize = 15 + pulse * 5;
-            
-            // Draw pulsing glow
-            const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, glowSize);
-            gradient.addColorStop(0, `rgba(255, 215, 0, ${0.6 * pulse})`);
-            gradient.addColorStop(0.5, `rgba(255, 215, 0, ${0.3 * pulse})`);
-            gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, glowSize, 0, 2 * Math.PI);
-            ctx.fill();
-            
-            // Draw selection ring
-            ctx.strokeStyle = '#FFD700';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, 12, 0, 2 * Math.PI);
-            ctx.stroke();
-          }
-
-          // Draw label
-          const label = node.name;
-          const fontSize = 12 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
-          const textWidth = ctx.measureText(label).width;
-          const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
-
-          // Draw label background
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y + 12, bckgDimensions[0], bckgDimensions[1]);
-
-          // Draw label text
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
-          ctx.fillStyle = 'black';
-          ctx.fillText(label, node.x, node.y + 13);
-        }}
-        nodePointerAreaPaint={(node, color, ctx) => {
-          // Circle matching the visual with padding
-          ctx.fillStyle = color;
-          ctx.beginPath();
-          ctx.arc(node.x, node.y, 12, 0, 2 * Math.PI, false);
-          ctx.fill();
-        }}
+        ref={(ref) => { window.fgRef = ref; }}
         onNodeClick={handleNodeClick}
         onBackgroundClick={handleBackgroundClick}
       />
