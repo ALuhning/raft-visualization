@@ -521,6 +521,25 @@ const NetworkGraph = () => {
         height={window.innerHeight - 90}
         backgroundColor="rgba(0,0,0,0)"
         enablePointerInteraction={true}
+        nodeCanvasObjectMode={() => 'after'}
+        nodeCanvasObject={(node, ctx, globalScale) => {
+          // Only draw the label - let library handle the node circle
+          const label = node.name;
+          const fontSize = 12 / globalScale;
+          ctx.font = `${fontSize}px Sans-Serif`;
+          const textWidth = ctx.measureText(label).width;
+          const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
+
+          // Draw label background
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y + 10, bckgDimensions[0], bckgDimensions[1]);
+
+          // Draw label text
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          ctx.fillStyle = 'black';
+          ctx.fillText(label, node.x, node.y + 11);
+        }}
         // Start zoomed in for better initial view
         d3VelocityDecay={0.3}
         cooldownTicks={100}
