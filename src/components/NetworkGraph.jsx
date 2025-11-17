@@ -513,8 +513,7 @@ const NetworkGraph = () => {
         // Display a tooltip on the link showing relationship and tensions.
         linkLabel={(link) => `${link.relationship}\n${link.tension}`}
         nodeColor={(node) => node.color}
-        nodeRelSize={6}
-        nodeVal={(node) => 10}
+        nodeRelSize={4}
         // Add arrows to the end of links to indicate directionality.
         linkDirectionalArrowLength={6}
         linkDirectionalArrowRelPos={1}
@@ -532,9 +531,9 @@ const NetworkGraph = () => {
         // Collision detection - prevent nodes from overlapping
         d3Force={(simulation) => {
           // Add collision force to prevent overlapping
-          simulation.force('collision', d3.forceCollide().radius(20).strength(1));
+          simulation.force('collision', d3.forceCollide().radius(12).strength(0.8));
           // Stronger charge force to spread nodes apart
-          simulation.force('charge').strength(-200);
+          simulation.force('charge').strength(-150);
         }}
         onEngineStop={() => {
           // Auto-zoom to fit with padding after initial layout
